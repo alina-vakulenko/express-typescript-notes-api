@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "module": "commonjs",
+    "baseUrl": "src",
+    "paths": {
+      "env/*": ["env/*"],
+      "config/*": ["config/*"],
+      "repositories/*": ["repositories/*"],
+      "services/*": ["services/*"],
+      "routes/*": ["routes/*"],
+      "validations/*": ["validations/*"],
+      "middleware/*": ["middleware/*"],
+      "helpers/*": ["helpers/*"]
+    },
+    "outDir": "./build",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strictPropertyInitialization": false,
+    "strict": true,
+    "skipLibCheck": true
+  }
+}
