@@ -2,7 +2,7 @@ import express, { Express } from "express";
 
 import cors from "cors";
 import corsOptions from "config/corsOptions";
-
+import errorHandler from "middleware/handleErrors";
 import appRouter from "routes";
 
 export const createServer = () => {
@@ -13,20 +13,17 @@ export const createServer = () => {
 
   appRouter(app);
 
+  app.use(errorHandler);
+
   return app;
 };
 
 export const startServer = (
   app: Express,
   port: number,
-  onSuccess: () => void,
-  onError: (error: unknown) => void
+  onSuccess: () => void
 ): void => {
-  try {
-    app.listen(port, () => {
-      onSuccess();
-    });
-  } catch (error) {
-    onError(error);
-  }
+  app.listen(port, () => {
+    onSuccess();
+  });
 };

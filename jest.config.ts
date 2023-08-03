@@ -21,7 +21,9 @@ const jestConfig: JestConfigWithTsJest = {
   modulePaths: ["src"],
   // allows you to specify module name mappings for modules that cannot be directly imported by their name.
   moduleNameMapper: pathsToModuleNameMapper({
+    "app/*": ["app/*"],
     "env/*": ["env/*"],
+    "data/*": ["data/*"],
     "config/*": ["config/*"],
     "repositories/*": ["repositories/*"],
     "services/*": ["services/*"],

@@ -1,11 +1,16 @@
 import express from "express";
+import notesService from "services/noteService";
 
 const router = express.Router();
 
-router.route("/").get().post();
+router.route("/").get(notesService.getAllNotes).post(notesService.createNote);
 
-router.route("/:id").get().patch().delete();
+router.route("/stats").get(notesService.getStats);
 
-router.route("/stats").get();
+router
+  .route("/:id")
+  .get(notesService.getNoteById)
+  .patch(notesService.updateNote)
+  .delete(notesService.deleteNote);
 
 export default router;

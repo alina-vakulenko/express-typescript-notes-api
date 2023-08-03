@@ -1,19 +1,24 @@
 import envVariables from "env";
 import { createServer, startServer } from "helpers/server.utils";
+import ErrorHandler from "helpers/errorHandler";
 import { logger } from "helpers/logger.utils";
 
-const port = envVariables.PORT;
 const app = createServer();
 
+export const errorHandler = new ErrorHandler(logger);
+
+const port = envVariables.PORT;
 const onServerStartSuccess = () => {
   logger.info(
     `${envVariables.NODE_ENV.toUpperCase()} server is running on port ${port}`
   );
 };
+startServer(app, port, onServerStartSuccess);
 
-const onServerStartError = (error: unknown) => {
-  logger.error(`${error}`);
-  process.exit(1);
-};
+process.on("unhandledRejection", (reason: Error) => {
+  throw reason;
+});
 
-startServer(app, port, onServerStartSuccess, onServerStartError);
+process.on("uncaughtException", (error: Error) => {
+  errorHandler.handleError(error);
+});
