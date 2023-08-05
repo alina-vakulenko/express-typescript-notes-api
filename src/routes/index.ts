@@ -1,13 +1,8 @@
-import { Express } from "express";
-
+import express from "express";
 import notesRouter from "./notesRouter";
 
-const appRouter = (app: Express) => {
-  app.use("/notes", notesRouter);
+const appRouter = express.Router();
 
-  app.all("*", (req, res) => {
-    res.sendStatus(404);
-  });
-};
+appRouter.use("/notes", notesRouter);
 
 export default appRouter;

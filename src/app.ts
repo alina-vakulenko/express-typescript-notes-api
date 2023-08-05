@@ -1,19 +1,20 @@
-import envVariables from "env";
-import { createServer, startServer } from "helpers/server.utils";
-import { logger } from "helpers/logger.utils";
+import express from "express";
+import cors from "cors";
+import corsOptions from "config/corsOptions";
+import setCredentialsHeader from "middleware/setCredentialsHeader";
+import handleNotFound from "middleware/handleNotFound";
+import handleErrors from "middleware/handleErrors";
+import appRouter from "routes";
 
-const port = envVariables.PORT;
-const app = createServer();
+const app = express();
 
-const onServerStartSuccess = () => {
-  logger.info(
-    `${envVariables.NODE_ENV.toUpperCase()} server is running on port ${port}`
-  );
-};
+app.use(cors(corsOptions));
+app.use(express.json());
+app.use(setCredentialsHeader);
 
-const onServerStartError = (error: unknown) => {
-  logger.error(`${error}`);
-  process.exit(1);
-};
+app.use("", appRouter);
 
-startServer(app, port, onServerStartSuccess, onServerStartError);
+app.use(handleNotFound);
+app.use(handleErrors);
+
+export default app;

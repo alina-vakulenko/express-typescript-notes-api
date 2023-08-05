@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { cleanEnv, port, str, num } from "envalid";
+import { cleanEnv, port, str } from "envalid";
 
 const env = cleanEnv(process.env, {
   NODE_ENV: str({ choices: ["development", "test", "production", "staging"] }),
