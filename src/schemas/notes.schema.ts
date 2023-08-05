@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { boolean, z } from "zod";
 
 export const NoteSchema = z.object({
   id: z
@@ -10,6 +10,7 @@ export const NoteSchema = z.object({
     .string({
       required_error: "Name is required",
     })
+    .min(1, "Name should not be empty")
     .trim(),
   created: z
     .string({
@@ -21,7 +22,7 @@ export const NoteSchema = z.object({
       return { message: "Invalid category" };
     },
   }),
-  content: z.string().trim(),
+  content: z.string().min(1, "Content should not be empty").trim(),
   dates: z
     .array(
       z.string().datetime({ message: "Invalid datetime string! Must be UTC." })
@@ -36,15 +37,17 @@ export const NoteCreateSchema = NoteSchema.pick({
   content: true,
 });
 
-export const PathIdSchema = z.object({ id: z.string().uuid() });
+export const NoteIdSchema = z.string().uuid();
+export const ParamsWithIdSchema = z.object({ id: NoteIdSchema });
 
-export const NoteUpdateSchema = z
-  .object({
-    data: NoteCreateSchema.partial(),
-  })
-  .merge(PathIdSchema);
+export const NoteUpdateSchema = NoteSchema.omit({
+  id: true,
+  created: true,
+  dates: true,
+}).partial();
 
 export type Note = z.infer<typeof NoteSchema>;
 export type NoteCreateInput = z.infer<typeof NoteCreateSchema>;
 export type NoteUpdateInput = z.infer<typeof NoteUpdateSchema>;
-export type PathId = z.infer<typeof PathIdSchema>;
+export type NoteId = z.infer<typeof NoteIdSchema>;
+export type ParamsWithId = z.infer<typeof ParamsWithIdSchema>;

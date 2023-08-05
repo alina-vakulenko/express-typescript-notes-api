@@ -12,7 +12,6 @@
       "repositories/*": ["repositories/*"],
       "services/*": ["services/*"],
       "routes/*": ["routes/*"],
-      "validations/*": ["validations/*"],
       "middleware/*": ["middleware/*"],
       "helpers/*": ["helpers/*"]
     },

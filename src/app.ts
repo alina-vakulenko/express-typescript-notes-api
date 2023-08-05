@@ -1,24 +1,20 @@
-import envVariables from "env";
-import { createServer, startServer } from "helpers/server.utils";
-import ErrorHandler from "helpers/errorHandler";
-import { logger } from "helpers/logger.utils";
+import express from "express";
+import cors from "cors";
+import corsOptions from "config/corsOptions";
+import setCredentialsHeader from "middleware/setCredentialsHeader";
+import handleNotFound from "middleware/handleNotFound";
+import handleErrors from "middleware/handleErrors";
+import appRouter from "routes";
 
-const app = createServer();
+const app = express();
 
-export const errorHandler = new ErrorHandler(logger);
+app.use(cors(corsOptions));
+app.use(express.json());
+app.use(setCredentialsHeader);
 
-const port = envVariables.PORT;
-const onServerStartSuccess = () => {
-  logger.info(
-    `${envVariables.NODE_ENV.toUpperCase()} server is running on port ${port}`
-  );
-};
-startServer(app, port, onServerStartSuccess);
+app.use("", appRouter);
 
-process.on("unhandledRejection", (reason: Error) => {
-  throw reason;
-});
+app.use(handleNotFound);
+app.use(handleErrors);
 
-process.on("uncaughtException", (error: Error) => {
-  errorHandler.handleError(error);
-});
+export default app;

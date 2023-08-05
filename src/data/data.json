@@ -1,78 +1,65 @@
 {
-  "notesList": [
+  "notes": [
     {
-      "id": "0",
-      "name": "Shopping list",
-      "created": "1970-01-01T00:00:01.996Z",
-      "category": "Task",
-      "content": "tomatoes, bread, eggs",
-      "archived": false
-    },
-    {
-      "id": "1",
-      "name": "The theory of evolution",
-      "created": "1970-01-01T00:00:01.988Z",
-      "category": "Random Thought",
-      "content": "Worth reading",
-      "archived": false
-    },
-    {
-      "id": "2",
-      "name": "Appointment",
-      "created": "1970-01-01T00:00:02.011Z",
-      "category": "Task",
-      "content": "I’m gonna have a dentist appointment on the 5/10/2021, I moved it from 5/12/2021",
-      "dates": ["5/10/2021", "5/12/2021"],
-      "archived": false
-    },
-    {
-      "id": "3",
-      "name": "Library",
-      "created": "1970-01-01T00:00:02.001Z",
-      "category": "Task",
-      "content": "Return three books to the library",
-      "archived": false
-    },
-    {
-      "id": "4",
-      "name": "Order birthday cake",
-      "created": "1970-01-01T00:00:01.999Z",
-      "category": "Task",
-      "content": "Should be ready by 6/1/2021",
-      "dates": ["6/1/2021"],
-      "archived": false
-    },
-    {
-      "id": "5",
-      "name": "New css trick",
-      "created": "1970-01-01T00:00:01.996Z",
-      "category": "Random Thoughts",
-      "content": "Try it out on my pet project",
-      "archived": false
-    },
-    {
-      "id": "6",
-      "name": "New feature",
-      "created": "1970-01-01T00:00:01.991Z",
-      "category": "Task",
-      "content": "Refactor code",
+      "id": "79405603-c167-4f0f-85ef-2b28b8fe8e09",
+      "name": "Idea 1",
+      "created": "2023-08-05T10:22:15Z",
+      "category": "Idea",
+      "content": "This is Idea 1 content.",
       "archived": true
     },
     {
-      "name": "test should be with id",
-      "category": "Task",
-      "content": "content content",
-      "id": "6ac495bc-3f8a-4f34-b4a8-05062c787582",
-      "created": "2023-08-03T11:32:46.734Z"
+      "id": "7c71def5-72e1-4b39-9b89-a78df079b7cc",
+      "name": "Random Thought 1",
+      "created": "2023-08-05T17:45:00Z",
+      "category": "Random Thought",
+      "content": "This is Random Thought 1 content.",
+      "dates": ["2023-08-06T08:00:00Z"],
+      "archived": false
     },
     {
-      "name": "test with dates",
+      "id": "5684151e-2659-4ad0-9327-3959a9cc7134",
+      "name": "Task 2",
+      "created": "2023-08-05T14:20:30Z",
+      "category": "Task",
+      "content": "This is Task 2 content.",
+      "dates": ["2023-08-06T15:30:00Z"],
+      "archived": false
+    },
+    {
+      "id": "7e8dc43c-be78-4c80-aea7-65506511f59f",
+      "name": "Idea 2",
+      "created": "2023-08-05T09:00:00Z",
       "category": "Idea",
-      "content": "content 8/3/2023 content",
-      "id": "ba54ea8a-5b9f-46fc-8802-9aaab279c77a",
-      "created": "2023-08-03T11:35:35.932Z",
-      "archived": false,
-      "dates": ["2023-08-02T21:00:00.000Z"]
+      "content": "This is Idea 2 content.",
+      "dates": ["2023-08-06T14:00:00Z", "2023-08-07T12:00:00Z"],
+      "archived": false
+    },
+    {
+      "id": "8cbadc86-efed-4e01-93fe-1dc1b1cf6876",
+      "name": "Random Thought 2",
+      "created": "2023-08-05T19:30:00Z",
+      "category": "Random Thought",
+      "content": "This is Random Thought 2 content.",
+      "dates": ["2023-08-06T16:45:00Z"],
+      "archived": true
+    },
+    {
+      "id": "d7cf5750-7943-4700-9e38-a9f4705d3f4b",
+      "name": "Task 3",
+      "created": "2023-08-05T11:10:00Z",
+      "category": "Task",
+      "content": "This is Task 3 content.",
+      "dates": ["2023-08-06T11:00:00Z", "2023-08-07T16:00:00Z"],
+      "archived": false
+    },
+    {
+      "id": "3759b977-3379-4fba-88be-bed3fe4fa0a2",
+      "name": "Idea 3",
+      "created": "2023-08-05T11:10:00Z",
+      "category": "Idea",
+      "content": "This is Idea 3 content.",
+      "archived": false
     }
   ]
 }

@@ -1,6 +1,9 @@
 import { Response } from "express";
 import { Logger } from "pino";
-import AppError, { HttpCode } from "./appError.utils";
+import { HttpCode } from "helpers/httpStatusCodes.utils";
+import { AppError } from "helpers/appError.utils";
+import { ValidationError } from "helpers/validationError.utils";
+import { logger } from "helpers/logger.utils";
 
 class ErrorHandler {
   private logger: Logger;
@@ -11,6 +14,13 @@ class ErrorHandler {
 
   private isTrustedError(err: Error): boolean {
     return err instanceof AppError && err.isOperational;
+  }
+
+  public handleValidationError(error: ValidationError, res: Response): void {
+    res.status(error.httpCode).json({
+      message: error.message,
+      issues: error.issues,
+    });
   }
 
   public handleError(error: Error | AppError, response?: Response): void {
@@ -37,4 +47,6 @@ class ErrorHandler {
   }
 }
 
-export default ErrorHandler;
+const errorHandler = new ErrorHandler(logger);
+
+export default errorHandler;
