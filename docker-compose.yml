@@ -1,0 +1,41 @@
+version: "3"
+
+services:
+  postgres:
+    image: postgres:14
+    container_name: postgres
+    expose:
+      - "5432"
+    env_file:
+      - .env
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  pg_admin:
+    image: dpage/pgadmin4
+    container_name: pg_admin
+    ports:
+      - 5000:80
+    env_file:
+      - .env
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+
+  backend:
+    build: .
+    container_name: notes-api
+    restart: on-failure
+    volumes:
+      - ./src:/notes-api/src
+    ports:
+      - "4444:4444"
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+
+volumes:
+  pg_data: {}
+  pgadmin_data: {}
