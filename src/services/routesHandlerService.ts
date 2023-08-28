@@ -8,7 +8,7 @@ import {
   NoteCreateInput,
   NoteUpdateInput,
   ParamsWithId,
-} from "schemas/notes.schema";
+} from "@schemas/notes.schema";
 
 export const handleCreateNoteRequest = async (
   req: Request,

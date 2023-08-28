@@ -1,4 +1,4 @@
-import { Note } from "schemas/notes.schema";
+import { Note } from "@schemas/notes.schema";
 import { NoteDb } from "./noteDB";
 
 export const createTestDb = (): NoteDb => {

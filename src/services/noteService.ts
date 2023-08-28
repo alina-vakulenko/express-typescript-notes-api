@@ -1,21 +1,21 @@
 import { v4 as uuidv4 } from "uuid";
-import noteRepository from "repositories/noteRepository";
-import { parseDates } from "helpers/parseDates.utils";
+import noteRepository from "@repositories/noteRepository";
+import { parseDates } from "@helpers/parseDates.utils";
 import {
   NoteCreateInput,
   NoteUpdateInput,
   NoteId,
   Note,
-} from "schemas/notes.schema";
-import { AppError } from "helpers/appError.utils";
-import { HttpCode } from "helpers/httpStatusCodes.utils";
+} from "@schemas/notes.schema";
+import { AppError } from "@helpers/appError.utils";
+import { HttpCode } from "@helpers/httpStatusCodes.utils";
 import { Stats } from "./types";
 
 class NoteService {
   async createNote(input: NoteCreateInput): Promise<Note> {
     const noteId = uuidv4();
-    const created = new Date().toISOString();
-    const newNote: Note = { ...input, id: noteId, created, archived: false };
+    const createdAt = new Date().toISOString();
+    const newNote: Note = { ...input, id: noteId, archived: false, createdAt };
 
     const datesFromContent = parseDates(input.content);
     if (datesFromContent.length > 0) {
@@ -106,7 +106,7 @@ class NoteService {
     const stats: Stats = {};
 
     for (const note of notesList) {
-      const category = note.category;
+      const category = note.category_id;
       const status = note.archived ? "archived" : "active";
 
       if (!stats[category]) {

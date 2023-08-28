@@ -1,9 +1,9 @@
 import { Response } from "express";
 import { Logger } from "pino";
-import { HttpCode } from "helpers/httpStatusCodes.utils";
-import { AppError } from "helpers/appError.utils";
-import { ValidationError } from "helpers/validationError.utils";
-import { logger } from "helpers/logger.utils";
+import { HttpCode } from "@helpers/httpStatusCodes.utils";
+import { AppError } from "@helpers/appError.utils";
+import { ValidationError } from "@helpers/validationError.utils";
+import { logger } from "@helpers/logger.utils";
 
 class ErrorHandler {
   private logger: Logger;

@@ -1,6 +1,6 @@
 import { Schema, ValidationResult } from "./types";
-import { HttpCode } from "helpers/httpStatusCodes.utils";
-import { ValidationError } from "helpers/validationError.utils";
+import { HttpCode } from "@helpers/httpStatusCodes.utils";
+import { ValidationError } from "@helpers/validationError.utils";
 
 export const validate = <T>(
   value: any,

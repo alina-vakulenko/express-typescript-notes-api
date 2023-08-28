@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { HttpCode } from "helpers/httpStatusCodes.utils";
-import { AppError } from "helpers/appError.utils";
+import { HttpCode } from "@helpers/httpStatusCodes.utils";
+import { AppError } from "@helpers/appError.utils";
 
 const handleNotFound = (req: Request, res: Response, next: NextFunction) => {
   res.status(404);

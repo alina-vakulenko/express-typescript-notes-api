@@ -1,9 +1,9 @@
 import fs from "fs/promises";
 import { readFileSync, existsSync } from "fs";
-import errorHandler from "services/errorHandlerService";
-import { Note } from "schemas/notes.schema";
-import { AppError } from "helpers/appError.utils";
-import { HttpCode } from "helpers/httpStatusCodes.utils";
+import errorHandler from "@services/errorHandlerService";
+import { Note } from "@schemas/notes.schema";
+import { AppError } from "@helpers/appError.utils";
+import { HttpCode } from "@helpers/httpStatusCodes.utils";
 
 export type NoteDb = { notes: Note[]; save: (data: Note[]) => Promise<void> };
 

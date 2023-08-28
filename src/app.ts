@@ -1,10 +1,10 @@
 import express from "express";
 import cors from "cors";
-import corsOptions from "config/corsOptions";
-import setCredentialsHeader from "middleware/setCredentialsHeader";
-import handleNotFound from "middleware/handleNotFound";
-import handleErrors from "middleware/handleErrors";
-import appRouter from "routes";
+import corsOptions from "@config/corsOptions";
+import setCredentialsHeader from "@middleware/setCredentialsHeader";
+import handleNotFound from "@middleware/handleNotFound";
+import handleErrors from "@middleware/handleErrors";
+import appRouter from "@routes/index";
 
 const app = express();
 

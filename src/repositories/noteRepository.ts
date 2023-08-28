@@ -1,5 +1,5 @@
 import path from "path";
-import { Note } from "schemas/notes.schema";
+import { Note } from "@schemas/notes.schema";
 import { NoteDb } from "data/noteDB";
 import { createNoteDb, prepopulateDB } from "data/noteDB";
 import { createTestDb } from "data/noteDB_TEST";

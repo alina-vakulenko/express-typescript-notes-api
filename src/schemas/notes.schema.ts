@@ -1,4 +1,4 @@
-import { boolean, z } from "zod";
+import { z } from "zod";
 
 export const NoteSchema = z.object({
   id: z
@@ -12,12 +12,12 @@ export const NoteSchema = z.object({
     })
     .min(1, "Name should not be empty")
     .trim(),
-  created: z
+  createdAt: z
     .string({
       required_error: "Date of creation is required",
     })
     .datetime({ message: "Invalid datetime string! Must be UTC." }),
-  category: z.enum(["Task", "Idea", "Random Thought"], {
+  category_id: z.enum(["Task", "Idea", "Random Thought"], {
     errorMap: (issue, ctx) => {
       return { message: "Invalid category" };
     },
@@ -33,7 +33,7 @@ export const NoteSchema = z.object({
 
 export const NoteCreateSchema = NoteSchema.pick({
   name: true,
-  category: true,
+  category_id: true,
   content: true,
 });
 
@@ -42,7 +42,7 @@ export const ParamsWithIdSchema = z.object({ id: NoteIdSchema });
 
 export const NoteUpdateSchema = NoteSchema.omit({
   id: true,
-  created: true,
+  createdAt: true,
   dates: true,
 }).partial();
 

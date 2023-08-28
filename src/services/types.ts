@@ -1,5 +1,5 @@
 import { AnyZodObject } from "zod";
-import { ValidationError } from "helpers/validationError.utils";
+import { ValidationError } from "@helpers/validationError.utils";
 
 export type Schema = AnyZodObject;
 
