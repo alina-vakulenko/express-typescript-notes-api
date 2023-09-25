@@ -1,0 +1,8 @@
+const { resolve } = require("path");
+
+module.exports = {
+  config: resolve("build", "db", "config.js"),
+  "models-path": resolve("build", "db", "models"),
+  "migrations-path": resolve("build", "db", "migrations"),
+  "seeders-path": resolve("build", "db", "seeders"),
+};

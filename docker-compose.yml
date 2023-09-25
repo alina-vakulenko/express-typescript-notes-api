@@ -1,0 +1,45 @@
+version: "3"
+
+services:
+  notes-api-postgres:
+    image: postgres:14
+    container_name: notes-api-postgres
+    ports:
+      - 5432:5432
+    env_file:
+      - .env
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  notes-api-pg-admin:
+    image: dpage/pgadmin4
+    container_name: notes-api-pg-admin
+    ports:
+      - 5000:80
+    env_file:
+      - .env
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - notes-api-postgres
+
+  # notes-api:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #     args:
+  #       - PORT = ${PORT}
+  #   container_name: notes-api
+  #   restart: on-failure
+  #   volumes:
+  #     - ./src:/notes-api/src
+  #   ports:
+  #     - 4444:${PORT}
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     - notes-api-postgres
+
+volumes:
+  pg_data: {}
+  pgadmin_data: {}

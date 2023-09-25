@@ -1,5 +1,5 @@
 import express from "express";
-import * as RoutesHandler from "services/routesHandlerService";
+import * as RoutesHandler from "@services/routesHandlerService";
 
 const router = express.Router();
 

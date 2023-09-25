@@ -1,29 +1,18 @@
 import { v4 as uuidv4 } from "uuid";
-import noteRepository from "repositories/noteRepository";
-import { parseDates } from "helpers/parseDates.utils";
+import noteRepository from "@repositories/noteRepository";
 import {
   NoteCreateInput,
   NoteUpdateInput,
   NoteId,
   Note,
-} from "schemas/notes.schema";
-import { AppError } from "helpers/appError.utils";
-import { HttpCode } from "helpers/httpStatusCodes.utils";
+} from "@schemas/notes.schema";
+import { AppError } from "@helpers/appError.utils";
+import { HttpCode } from "@helpers/httpStatusCodes.utils";
 import { Stats } from "./types";
 
 class NoteService {
   async createNote(input: NoteCreateInput): Promise<Note> {
-    const noteId = uuidv4();
-    const created = new Date().toISOString();
-    const newNote: Note = { ...input, id: noteId, created, archived: false };
-
-    const datesFromContent = parseDates(input.content);
-    if (datesFromContent.length > 0) {
-      newNote.dates = datesFromContent;
-    }
-
-    await noteRepository.create(newNote);
-
+    const newNote = await noteRepository.create(input);
     return newNote;
   }
   async getAllNotes(): Promise<Note[]> {
@@ -32,7 +21,7 @@ class NoteService {
     if (notesList.length === 0) {
       throw new AppError({
         httpCode: HttpCode.NO_CONTENT,
-        message: "No notes found",
+        message: "Notes list is empty",
       });
     }
 
@@ -60,24 +49,18 @@ class NoteService {
       });
     }
 
-    const { archived, ...otherInputData } = input;
-    const isOtherInputDataNotEmpty = Object.keys(otherInputData).length > 0;
+    const { archived, ...otherInputs } = input;
+    // if note is archived, only "archived" status can be changed
+    const fieldsToEditExcludingArchived = Object.keys(otherInputs).length > 0;
 
-    if (note.archived && isOtherInputDataNotEmpty) {
+    if (note.archived && fieldsToEditExcludingArchived) {
       throw new AppError({
         httpCode: HttpCode.FORBIDDEN,
-        message:
-          "Archived notes can't be changed. To edit note, make it active first",
+        message: "Archived notes can't be changed",
       });
     }
 
-    let dates = null;
-    if (input.content) {
-      dates = parseDates(input.content);
-    }
-    const fieldsToUpdate = dates ? { ...input, dates } : input;
-
-    await noteRepository.updateOne(id, fieldsToUpdate);
+    await noteRepository.updateOne(id, input);
   }
 
   async deleteNote(id: NoteId): Promise<void> {
@@ -99,14 +82,14 @@ class NoteService {
     if (notesList.length === 0) {
       throw new AppError({
         httpCode: HttpCode.NO_CONTENT,
-        message: "No notes found",
+        message: "Notes list is empty",
       });
     }
 
     const stats: Stats = {};
 
     for (const note of notesList) {
-      const category = note.category;
+      const category = note.category_id;
       const status = note.archived ? "archived" : "active";
 
       if (!stats[category]) {

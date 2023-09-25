@@ -1,5 +1,5 @@
 import request from "supertest";
-import app from "app";
+import app from "../src/app";
 
 describe("app", () => {
   it("responds with a 'Not found' message if request is not recognized", (done) => {
