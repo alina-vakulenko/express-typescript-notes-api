@@ -12,22 +12,13 @@ export const NoteSchema = z.object({
     })
     .min(1, "Name should not be empty")
     .trim(),
-  createdAt: z
-    .string({
-      required_error: "Date of creation is required",
-    })
-    .datetime({ message: "Invalid datetime string! Must be UTC." }),
-  category_id: z.enum(["Task", "Idea", "Random Thought"], {
-    errorMap: (issue, ctx) => {
-      return { message: "Invalid category" };
-    },
+  createdAt: z.coerce.date(),
+  category_id: z.number({
+    required_error: "Category id is required",
+    invalid_type_error: "Category id should be an integer",
   }),
   content: z.string().min(1, "Content should not be empty").trim(),
-  dates: z
-    .array(
-      z.string().datetime({ message: "Invalid datetime string! Must be UTC." })
-    )
-    .optional(),
+  dates: z.array(z.coerce.date()).optional(),
   archived: z.boolean().default(false),
 });
 
@@ -39,12 +30,9 @@ export const NoteCreateSchema = NoteSchema.pick({
 
 export const NoteIdSchema = z.string().uuid();
 export const ParamsWithIdSchema = z.object({ id: NoteIdSchema });
-
-export const NoteUpdateSchema = NoteSchema.omit({
-  id: true,
-  createdAt: true,
-  dates: true,
-}).partial();
+export const NoteUpdateSchema = NoteCreateSchema.partial().merge(
+  z.object({ archived: z.boolean().optional() })
+);
 
 export type Note = z.infer<typeof NoteSchema>;
 export type NoteCreateInput = z.infer<typeof NoteCreateSchema>;

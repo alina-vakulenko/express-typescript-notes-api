@@ -1,5 +1,5 @@
 import { Options, Dialect } from "sequelize";
-import env from "@env";
+import env from "../env";
 
 interface Config {
   development: Options;

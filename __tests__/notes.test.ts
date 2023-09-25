@@ -1,254 +1,246 @@
 import request from "supertest";
-import app from "app";
-import { Note } from "schemas/notes.schema";
-import { db } from "repositories/noteRepository";
+import app from "../src/app";
 import * as testData from "./notes.fixture";
+import { Note } from "./../src/schemas/notes.schema";
 
-it("GET /notes -> responds with a 204 status if the notes array is empty", (done) => {
-  request(app)
-    .get("/notes")
-    .set("Accept", "application/json")
-    .expect(204, done);
+const requestWithSupertest = request(app);
+
+describe("GET /notes", () => {
+  it("responds with a non-emty array and a number of items in the array", async () => {
+    const res = await requestWithSupertest
+      .get("/notes")
+      .set("Accept", "application/json");
+
+    expect(res.statusCode).toBe(200);
+    expect(res.headers["content-type"]).toMatch(/json/);
+    expect(res.body).toHaveProperty("notes");
+    expect(res.body).toHaveProperty("count");
+    expect(res.body.count).toBe(res.body.notes.length);
+    expect(res.body.notes.length).toBeGreaterThan(0);
+  });
 });
 
-describe("Notes array is not empty", () => {
-  beforeAll(() => db.save(testData.initialData as Note[]));
+describe("If an id passed as a query parameter is invalid", () => {
+  it("responds with a 400 status code on GET request", async () => {
+    const res = await requestWithSupertest
+      .get(`/notes/invalidId`)
+      .set("Accept", "application/json");
 
-  describe("GET /notes", () => {
-    it("responds with an array of notes and the number of items in the array", async () =>
-      request(app)
-        .get("/notes")
-        .set("Accept", "application/json")
-        .expect(200)
-        .then((response) => {
-          expect(response.body).toHaveProperty("notes");
-          expect(response.body).toHaveProperty("count");
-          expect(response.body.count).toBe(response.body.notes.length);
-          expect(response.body.notes).toEqual(
-            expect.arrayContaining([testData.existingNote])
-          );
-        }));
+    expect(res.statusCode).toBe(400);
+    expect(res.headers["content-type"]).toMatch(/json/);
+    expect(res.body.message).toBe("Invalid request");
+    expect(res.body.issues.length).toBeGreaterThan(0);
   });
+  it("responds with a 400 status code on PATCH request", async () => {
+    const res = await requestWithSupertest
+      .patch("/notes/invalidId")
+      .set("Accept", "application/json")
+      .send({
+        name: "Note should not be created",
+        category_id: 1,
+        content: "Id is invalid",
+      });
 
-  describe("GET /notes/stats", () => {
-    it("responds with a stats object containing the number of notes by categories", async () =>
-      request(app)
-        .get("/notes/stats")
-        .set("Accept", "application/json")
-        .expect(200)
-        .then((response) => {
-          expect(response.body).toHaveProperty("stats");
-          expect(response.body.stats).toEqual(testData.statsObject);
-        }));
+    expect(res.statusCode).toBe(400);
+    expect(res.headers["content-type"]).toMatch(/json/);
+    expect(res.body.message).toBe("Invalid request");
+    expect(res.body.issues.length).toBeGreaterThan(0);
+  });
+  it("responds with a 400 status code on DELETE request", async () => {
+    const res = await requestWithSupertest
+      .delete("/notes/invalidId")
+      .set("Accept", "application/json");
+
+    expect(res.statusCode).toBe(400);
+    expect(res.headers["content-type"]).toMatch(/json/);
+    expect(res.body.message).toBe("Invalid request");
+    expect(res.body.issues.length).toBeGreaterThan(0);
+  });
+});
+
+describe("If an id passed as a query parameter doesn't exist in a DB", () => {
+  it("responds with a 404 status code on GET request", async () => {
+    const res = await requestWithSupertest
+      .get(`/notes/${testData.noteIdValidNotExisting}`)
+      .set("Accept", "application/json");
+
+    expect(res.headers["content-type"]).toMatch(/json/);
+    expect(res.statusCode).toBe(404);
+  });
+  it("responds with a 404 status code on PATCH request", async () => {
+    const res = await requestWithSupertest
+      .patch(`/notes/${testData.noteIdValidNotExisting}`)
+      .set("Accept", "application/json")
+      .send({
+        name: "Note should not be created",
+        category_id: 1,
+        content: "Id does not exist",
+      });
+
+    expect(res.headers["content-type"]).toMatch(/json/);
+    expect(res.statusCode).toBe(404);
+  });
+  it("responds with a 404 status code on DELETE request", async () => {
+    const res = await requestWithSupertest
+      .delete(`/notes/${testData.noteIdValidNotExisting}`)
+      .set("Accept", "application/json");
+
+    expect(res.headers["content-type"]).toMatch(/json/);
+    expect(res.statusCode).toBe(404);
+  });
+});
+
+let createdNote: Note;
+describe("queries on test note", () => {
+  beforeAll(async () => {
+    const res = await requestWithSupertest
+      .post("/notes")
+      .set("Accept", "application/json")
+      .send(testData.noteCreateInput);
+    createdNote = res.body;
+  });
+  afterAll(async () => {
+    await requestWithSupertest.delete(`/notes/${createdNote.id}`);
+    createdNote = {} as Note;
   });
 
   describe("GET /notes/:id", () => {
-    it("responds with a single note object", async () =>
-      request(app)
-        .get(`/notes/${testData.noteIdValidExisting}`)
-        .set("Accept", "application/json")
-        .expect("Content-Type", /json/)
-        .expect(200)
-        .then((response) => {
-          expect(response.body).toEqual(testData.existingNote);
-        }));
-    it("responds with an 'Invalid request' message if the id is invalid", async () => {
-      request(app)
-        .get(`/notes/${testData.noteIdInvalid}`)
-        .set("Accept", "application/json")
-        .expect("Content-Type", /json/)
-        .expect(400)
-        .then((response) => {
-          expect(response.body.message).toBe("Invalid request");
-          expect(response.body.issues.length).toBeGreaterThan(0);
-        });
-    });
-    it("responds with a not found error if the id doesn't exist in db", (done) => {
-      request(app)
-        .get(`/notes/${testData.noteIdValidNotExisting}`)
-        .set("Accept", "application/json")
-        .expect("Content-Type", /json/)
-        .expect(404, done);
-    });
-  });
+    it("responds with a single note object", async () => {
+      const res = await requestWithSupertest
+        .get(`/notes/${createdNote.id}`)
+        .set("Accept", "application/json");
 
-  describe("POST /notes", () => {
-    it("responds with the newly created note object with an auto generated id, time of creation, and an archived flag with a false value by default", async () =>
-      request(app)
-        .post("/notes")
-        .set("Accept", "application/json")
-        .send(testData.noteCreateInput)
-        .expect("Content-Type", /json/)
-        .then((response) => {
-          expect(response.statusCode).toBe(201);
-          expect(response.body).toHaveProperty("id");
-          expect(response.body).toHaveProperty("created");
-          expect(response.body).toHaveProperty("archived");
-          expect(response.body.archived).toBe(false);
-        }));
-    it("extracts dates from content into the 'dates' property", async () =>
-      request(app)
-        .post("/notes")
-        .set("Accept", "application/json")
-        .send(testData.noteCreateInputWithDates)
-        .expect("Content-Type", /json/)
-        .then((response) => {
-          expect(response.statusCode).toBe(201);
-          expect(response.body).toHaveProperty("dates");
-          expect(response.body.dates).toEqual(
-            expect.arrayContaining([
-              testData.firstTestDate,
-              testData.secontTestDate,
-            ])
-          );
-        }));
-    it("skips the dates property if dates can't be parsed from the content", async () =>
-      request(app)
-        .post("/notes")
-        .set("Accept", "application/json")
-        .send({
-          name: "Valid name",
-          category: "Random Thought",
-          content: "Remind me 1st of September",
-        })
-        .expect("Content-Type", /json/)
-        .then((response) => {
-          expect(response.statusCode).toBe(201);
-          expect(response.body).not.toHaveProperty("dates");
-        }));
-    it("responds with an array of validation issues if the request is incorrect", async () =>
-      request(app)
-        .post("/notes")
-        .set("Accept", "application/json")
-        .send(testData.invalidNoteCreateInput)
-        .expect("Content-Type", /json/)
-        .expect(400)
-        .then((response) => {
-          expect(response.body.message).toBe("Invalid request");
-          expect(response.body.issues.length).toBeGreaterThan(0);
-        }));
+      expect(res.statusCode).toBe(200);
+      expect(res.headers["content-type"]).toMatch(/json/);
+      expect(res.body).toEqual(createdNote);
+    });
   });
 
   describe("PATCH /notes/:id", () => {
-    it("responds with an 'Invalid request' message if the id is invalid", async () => {
-      request(app)
-        .patch(`/notes/${testData.noteIdInvalid}`)
+    it("responds with a 400 status code and an array of validation issues if request is incorrect", async () => {
+      const res = await requestWithSupertest
+        .patch(`/notes/${createdNote.id}`)
         .set("Accept", "application/json")
-        .send({
-          name: "Updating name",
-          category: "Task",
-          content: "Updating content",
-        })
-        .expect("Content-Type", /json/)
-        .expect(400)
-        .then((response) => {
-          expect(response.body.message).toBe("Invalid request");
-          expect(response.body.issues.length).toBeGreaterThan(0);
-        });
-    });
-    it("responds with a not found error if the id doesn't exist in db", (done) => {
-      request(app)
-        .patch(`/notes/${testData.noteIdValidNotExisting}`)
-        .set("Accept", "application/json")
-        .send({
-          name: "Updating name",
-          category: "Task",
-          content: "Updating content",
-        })
-        .expect("Content-Type", /json/)
-        .expect(404, done);
-    });
-    it("responds with an array of validation issues if request is incorrect", async () =>
-      request(app)
-        .patch(`/notes/${testData.noteIdValidExisting}`)
-        .set("Accept", "application/json")
-        .send(testData.invalidNoteUpdateInput)
-        .expect("Content-Type", /json/)
-        .expect(400)
-        .then((response) => {
-          expect(response.body.message).toBe("Invalid request");
-          expect(response.body.issues.length).toBeGreaterThan(0);
-        }));
-    it("responds with a 200 status code and a success message with the correct request data", async () => {
-      request(app)
-        .patch(`/notes/${testData.noteIdValidExisting}`)
-        .send(testData.noteUpdateInput)
-        .expect(200)
-        .then((response) => {
-          expect(response.body.message).toBe("success");
-        });
-    });
-    it("responds with a 403 status code if the note is archived", async () => {
-      request(app)
-        .patch(`/notes/${testData.archivedNoteId}`)
-        .send(testData.noteUpdateInput)
-        .expect(403)
-        .then((response) => {
-          expect(response.body.message).toBe(
-            "Archived notes can't be changed. To edit note, make it active first"
-          );
-        });
-    });
-    it("allows to change archived status", async () => {
-      request(app)
-        .patch(`/notes/${testData.archivedNoteId}`)
-        .send({ archived: false })
-        .expect(200)
-        .then((response) => {
-          expect(response.body.message).toBe("success");
-        });
-    });
-  });
+        .send(testData.invalidNoteUpdateInput);
 
-  describe("Editing content with dates", () => {
-    it("allows to edit content", async () => {
-      request(app)
-        .patch("/notes/368e43ec-dd2c-48dd-8d35-c3a7cef44313")
-        .send({ content: "01/01/2023 new content with dates" })
-        .expect(200)
-        .then((response) => {
-          expect(response.body.message).toBe("success");
-        });
+      expect(res.statusCode).toBe(400);
+      expect(res.headers["content-type"]).toMatch(/json/);
+      expect(res.body.message).toBe("Invalid request");
+      expect(res.body.issues.length).toBeGreaterThan(0);
+    });
+    it("responds with a 200 status code and a success message if request is correct", async () => {
+      const res = await requestWithSupertest
+        .patch(`/notes/${createdNote.id}`)
+        .set("Accept", "application/json")
+        .send(testData.noteUpdateInput);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.headers["content-type"]).toMatch(/json/);
+      expect(res.body.message).toBe("success");
+    });
+    it("responds with a 403 status code and a warning message if the note is archived", async () => {
+      const res = await requestWithSupertest
+        .patch(`/notes/${createdNote.id}`)
+        .set("Accept", "application/json")
+        .send(testData.noteUpdateInput);
+
+      expect(res.statusCode).toBe(403);
+      expect(res.headers["content-type"]).toMatch(/json/);
+      expect(res.body.message).toBe("Archived notes can't be changed");
+    });
+    it("allows to unarchive the note", async () => {
+      const res = await requestWithSupertest
+        .patch(`/notes/${createdNote.id}`)
+        .set("Accept", "application/json")
+        .send({ archived: false });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.headers["content-type"]).toMatch(/json/);
+      expect(res.body.message).toBe("success");
+    });
+    it("allows to edit active note", async () => {
+      const res = await requestWithSupertest
+        .patch(`/notes/${createdNote.id}`)
+        .set("Accept", "application/json")
+        .send({ content: "01/01/2023 new content with dates" });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.headers["content-type"]).toMatch(/json/);
+      expect(res.body.message).toBe("success");
     });
     it("changes extracted dates if content was edited", async () => {
-      request(app)
-        .get("/notes/368e43ec-dd2c-48dd-8d35-c3a7cef44313")
-        .expect(200)
-        .then((response) => {
-          expect(response.body).toHaveProperty("dates");
-          expect(response.body.dates).toEqual(
-            expect.arrayContaining(["2023-01-01T00:00:00.000Z"])
-          );
-        });
+      const res = await requestWithSupertest
+        .get(`/notes/${createdNote.id}`)
+        .set("Accept", "application/json");
+
+      expect(res.statusCode).toBe(200);
+      expect(res.headers["content-type"]).toMatch(/json/);
+      expect(res.body.dates).toEqual(
+        expect.arrayContaining(["2023-01-01T00:00:00.000Z"])
+      );
     });
   });
+});
 
-  describe("DELETE /notes/:id", () => {
-    it("responds with an 'Invalid request' message if the id is invalid", async () => {
-      request(app)
-        .delete(`/notes/${testData.noteIdInvalid}`)
-        .set("Accept", "application/json")
-        .expect("Content-Type", /json/)
-        .expect(400)
-        .then((response) => {
-          expect(response.body.message).toBe("Invalid request");
-          expect(response.body.issues.length).toBeGreaterThan(0);
-        });
-    });
-    it("responds with a not found error if the id doesn't exist in db", (done) => {
-      request(app)
-        .delete(`/notes/${testData.noteIdValidNotExisting}`)
-        .set("Accept", "application/json")
-        .expect("Content-Type", /json/)
-        .expect(404, done);
-    });
-    it("responds with a 200 status code and a success message", async () => {
-      request(app)
-        .delete(`/notes/${testData.noteIdValidExisting}}`)
-        .expect(200)
-        .then((response) => {
-          expect(response.body.message).toBe("success");
-        });
-    });
+describe("POST /notes", () => {
+  it("responds with a 201 status code and the generated note object", async () => {
+    const res = await requestWithSupertest
+      .post("/notes")
+      .set("Accept", "application/json")
+      .send(testData.noteCreateInput);
+
+    expect(res.statusCode).toBe(201);
+    expect(res.headers["content-type"]).toMatch(/json/);
+    expect(res.body).toHaveProperty("id");
+    expect(res.body).toHaveProperty("createdAt");
+    expect(res.body).toHaveProperty("dates");
+    expect(res.body).toHaveProperty("archived");
+    expect(res.body.archived).toBe(false);
+    expect(res.body.dates).toEqual(
+      expect.arrayContaining([testData.firstTestDate, testData.secontTestDate])
+    );
+
+    await requestWithSupertest.delete(`/notes/${res.body.id}`);
+  });
+  it("responds with a 400 status code and an array of validation issues if the request is incorrect", async () => {
+    const res = await requestWithSupertest
+      .post("/notes")
+      .set("Accept", "application/json")
+      .send(testData.invalidNoteCreateInput);
+
+    expect(res.statusCode).toBe(400);
+    expect(res.headers["content-type"]).toMatch(/json/);
+    expect(res.body.message).toBe("Invalid request");
+    expect(res.body.issues.length).toBeGreaterThan(0);
+  });
+});
+
+describe("DELETE /notes/:id", () => {
+  beforeAll(async () => {
+    const res = await requestWithSupertest
+      .post("/notes")
+      .set("Accept", "application/json")
+      .send(testData.noteCreateInput);
+    createdNote = res.body;
+  });
+
+  it("responds with a 200 status code and a success message", async () => {
+    const res = await requestWithSupertest.delete(`/notes/${createdNote.id}`);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.message).toBe("success");
+  });
+});
+
+describe("GET /notes/stats", () => {
+  it("responds with an object containing the number of notes by categories", async () => {
+    const res = await requestWithSupertest
+      .get("/notes/stats")
+      .set("Accept", "application/json");
+
+    expect(res.statusCode).toBe(200);
+    expect(res.headers["content-type"]).toMatch(/json/);
+    expect(res.body).toHaveProperty("stats");
+    expect(res.body.stats).toEqual(testData.statsObject);
   });
 });

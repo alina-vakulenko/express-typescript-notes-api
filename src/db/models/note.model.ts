@@ -7,6 +7,7 @@ import {
   UUIDV4,
 } from "sequelize";
 import dbConnection from "@db/connection";
+import { parseDates } from "@helpers/parseDates.utils";
 
 class Note extends Model<InferAttributes<Note>, InferCreationAttributes<Note>> {
   declare id: CreationOptional<string>;
@@ -15,7 +16,7 @@ class Note extends Model<InferAttributes<Note>, InferCreationAttributes<Note>> {
   declare category_id: number;
   declare dates: CreationOptional<Date[]>;
   declare archived: CreationOptional<boolean>;
-  declare readonly createdAt: Date;
+  declare readonly createdAt: CreationOptional<Date>;
 }
 
 Note.init(
@@ -28,7 +29,7 @@ Note.init(
     },
     name: { type: DataTypes.STRING, allowNull: false },
     category_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.NUMBER,
       allowNull: false,
       references: {
         model: "Category",
@@ -36,7 +37,12 @@ Note.init(
       },
     },
     content: { type: DataTypes.TEXT, allowNull: false },
-    dates: { type: DataTypes.ARRAY(DataTypes.DATE) },
+    dates: {
+      type: DataTypes.VIRTUAL,
+      get() {
+        return parseDates(this.content);
+      },
+    },
     archived: {
       type: DataTypes.BOOLEAN,
       allowNull: false,

@@ -14,7 +14,7 @@ class Category extends Model<
 > {
   declare id: CreationOptional<string>;
   declare name: string;
-  declare readonly createdAt: Date;
+  declare readonly createdAt: CreationOptional<Date>;
 }
 
 Category.init(

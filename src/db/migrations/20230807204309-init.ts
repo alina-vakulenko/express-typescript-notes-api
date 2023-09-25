@@ -39,9 +39,6 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: false,
       },
-      dates: {
-        type: Sequelize.ARRAY(Sequelize.DATE),
-      },
       archived: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
