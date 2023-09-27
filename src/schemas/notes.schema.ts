@@ -13,7 +13,7 @@ export const NoteSchema = z.object({
     .min(1, "Name should not be empty")
     .trim(),
   createdAt: z.coerce.date(),
-  category_id: z.number({
+  categoryId: z.number({
     required_error: "Category id is required",
     invalid_type_error: "Category id should be an integer",
   }),
@@ -24,7 +24,7 @@ export const NoteSchema = z.object({
 
 export const NoteCreateSchema = NoteSchema.pick({
   name: true,
-  category_id: true,
+  categoryId: true,
   content: true,
 });
 

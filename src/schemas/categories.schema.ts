@@ -8,11 +8,18 @@ export const CategorySchema = z.object({
     })
     .min(1, "Name should not be empty")
     .trim(),
+  slug: z
+    .string({
+      required_error: "Slug is required",
+    })
+    .min(1, "Slug should not be empty")
+    .trim(),
   createdAt: z.coerce.date(),
 });
 
 export const CategoryCreateSchema = CategorySchema.pick({
   name: true,
+  slug: true,
 });
 
 export const CategoryIdSchema = z.number();

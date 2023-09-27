@@ -1,3 +1,3 @@
-const allowedOrigins: string[] = ["http://localhost:4444"];
+const allowedOrigins: string[] = ["http://localhost:5173"];
 
 export default allowedOrigins;

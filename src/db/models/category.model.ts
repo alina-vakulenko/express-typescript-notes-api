@@ -4,7 +4,6 @@ import {
   InferAttributes,
   InferCreationAttributes,
   CreationOptional,
-  UUIDV4,
 } from "sequelize";
 import dbConnection from "@db/connection";
 
@@ -12,27 +11,28 @@ class Category extends Model<
   InferAttributes<Category>,
   InferCreationAttributes<Category>
 > {
-  declare id: CreationOptional<string>;
+  declare id: CreationOptional<number>;
   declare name: string;
+  declare slug: string;
   declare readonly createdAt: CreationOptional<Date>;
 }
 
 Category.init(
   {
     id: {
-      type: DataTypes.UUID,
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
       primaryKey: true,
-      allowNull: false,
-      defaultValue: UUIDV4,
     },
-    name: { type: DataTypes.STRING, allowNull: false },
+    name: { type: DataTypes.STRING, allowNull: false, unique: true },
+    slug: { type: DataTypes.STRING, allowNull: false, unique: true },
     createdAt: DataTypes.DATE,
   },
   {
-    timestamps: true,
+    underscored: true,
     updatedAt: false,
     sequelize: dbConnection,
-    modelName: "Category",
+    modelName: "category",
   }
 );
 

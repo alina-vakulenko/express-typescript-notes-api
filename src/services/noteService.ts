@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
 import noteRepository from "@repositories/noteRepository";
 import {
   NoteCreateInput,
@@ -27,6 +26,7 @@ class NoteService {
 
     return notesList;
   }
+
   async getNoteById(id: NoteId): Promise<Note> {
     const note = await noteRepository.findById(id);
 
@@ -89,7 +89,7 @@ class NoteService {
     const stats: Stats = {};
 
     for (const note of notesList) {
-      const category = note.category_id;
+      const category = note.categoryId;
       const status = note.archived ? "archived" : "active";
 
       if (!stats[category]) {

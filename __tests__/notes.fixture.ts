@@ -20,27 +20,27 @@ export const statsObject = {
 
 export const noteCreateInput = {
   name: "Test note",
-  category_id: 3,
+  categoryId: 3,
   content:
     "This is the first date 8/2/2023, and this is the second date 08/03/2023",
 };
 
 export const noteUpdateInput = {
   name: "Name of updated note",
-  category_id: 1,
+  categoryId: 1,
   content: "Content of updated note",
   archived: true,
 };
 
 export const invalidNoteCreateInput = {
   name: "",
-  category_id: 4,
+  categoryId: 4,
   dates: ["September, 1st"],
 };
 
 export const invalidNoteUpdateInput = {
   name: "Update should not happen",
-  category_id: 3,
+  categoryId: 3,
   dates: [],
   createdAt: "today",
 };

@@ -1,39 +1,44 @@
 module.exports = {
   up: async (queryInterface: any, Sequelize: any) => {
-    await queryInterface.createTable("Categories", {
+    await queryInterface.createTable("categories", {
       id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
         type: Sequelize.INTEGER,
+        allowNull: false,
+        primaryKey: true,
+        autoIncrement: true,
       },
       name: {
         type: Sequelize.STRING,
-      },
-      createdAt: {
         allowNull: false,
+        unique: true,
+      },
+      created_at: {
         type: Sequelize.DATE,
+        allowNull: false,
       },
     });
 
-    await queryInterface.createTable("Notes", {
+    await queryInterface.createTable("notes", {
       id: {
         type: Sequelize.UUID,
         primaryKey: true,
         allowNull: false,
         defaultValue: Sequelize.UUIDV4,
       },
+      category_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 1,
+        references: {
+          model: "categories",
+          key: "id",
+        },
+        onDelete: "SET DEFAULT",
+        onUpdate: "CASCADE",
+      },
       name: {
         type: Sequelize.STRING,
         allowNull: false,
-      },
-      category_id: {
-        allowNull: false,
-        type: Sequelize.INTEGER,
-        references: {
-          model: "Categories",
-          key: "id",
-        },
       },
       content: {
         type: Sequelize.TEXT,
@@ -44,14 +49,14 @@ module.exports = {
         allowNull: false,
         defaultValue: false,
       },
-      createdAt: {
+      created_at: {
         type: Sequelize.DATE,
         allowNull: false,
       },
     });
   },
   down: async (queryInterface: any) => {
-    await queryInterface.dropTable("Notes");
-    await queryInterface.dropTable("Categories");
+    await queryInterface.dropTable("notes");
+    await queryInterface.dropTable("categories");
   },
 };

@@ -37,7 +37,7 @@ describe("If an id passed as a query parameter is invalid", () => {
       .set("Accept", "application/json")
       .send({
         name: "Note should not be created",
-        category_id: 1,
+        categoryId: 1,
         content: "Id is invalid",
       });
 
@@ -73,7 +73,7 @@ describe("If an id passed as a query parameter doesn't exist in a DB", () => {
       .set("Accept", "application/json")
       .send({
         name: "Note should not be created",
-        category_id: 1,
+        categoryId: 1,
         content: "Id does not exist",
       });
 

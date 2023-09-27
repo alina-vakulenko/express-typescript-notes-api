@@ -4,10 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc && tsc-alias",
+    "build": "tsc --project tsconfig.build.json && tsc-alias",
     "start:prod": "npm run build && node build/index.js",
     "start:dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/index.ts",
-    "migrate:up": "npx sequelize-cli db:migrate",
+    "migration-template": "npx sequelize-cli migration:generate --name migration-skeleton",
+    "migrate:up": "npm run build && npx sequelize-cli db:migrate",
     "migrate:undo": "npx sequelize-cli db:migrate:undo",
     "seed": "npx sequelize-cli db:seed:all",
     "test": "jest --coverage --detectOpenHandles"
