@@ -17,18 +17,13 @@ export const CategorySchema = z.object({
   createdAt: z.coerce.date(),
 });
 
-export const CategoryCreateSchema = CategorySchema.pick({
+export const CreateCategorySchema = CategorySchema.pick({
   name: true,
-  slug: true,
 });
+export const UpdateCategorySchema = CreateCategorySchema.partial();
 
-export const CategoryIdSchema = z.number();
-export const ParamsWithIdSchema = z.object({ id: CategoryIdSchema });
-
-export const CategoryUpdateSchema = CategoryCreateSchema.partial();
+export const ParamsWithSlugSchema = CategorySchema.pick({ slug: true });
 
 export type Category = z.infer<typeof CategorySchema>;
-export type CategoryCreateInput = z.infer<typeof CategoryCreateSchema>;
-export type CategoryUpdateInput = z.infer<typeof CategoryUpdateSchema>;
-export type CategoryId = z.infer<typeof CategoryIdSchema>;
-export type ParamsWithId = z.infer<typeof ParamsWithIdSchema>;
+export type CreateCategoryInput = z.infer<typeof CreateCategorySchema>;
+export type UpdateCategoryInput = z.infer<typeof UpdateCategorySchema>;

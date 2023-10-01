@@ -1,14 +1,17 @@
 import type {
   Note,
-  NoteCreateInput,
-  NoteUpdateInput,
+  CreateNoteInput,
+  UpdateNoteInput,
 } from "@schemas/notes.schema";
 import NoteModel from "@db/models/note.model";
 import CategoryModel from "@db/models/category.model";
 
 class NoteRepository {
-  public async create(data: NoteCreateInput): Promise<Note> {
-    return await NoteModel.create(data);
+  public async create(data: CreateNoteInput): Promise<Note> {
+    const newNote = await NoteModel.create(data);
+    const category = await newNote.getCategory();
+    console.log(category);
+    return newNote;
   }
 
   public async findAll(): Promise<Note[]> {
@@ -36,7 +39,7 @@ class NoteRepository {
     });
   }
 
-  public async updateOne(id: string, data: NoteUpdateInput): Promise<void> {
+  public async updateOne(id: string, data: UpdateNoteInput): Promise<void> {
     await NoteModel.update(data, { where: { id: id } });
   }
 }

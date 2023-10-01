@@ -1,9 +1,8 @@
-import request from "supertest";
-import app from "../src/app";
+import { requestWithSupertest } from "./config";
 
 describe("app", () => {
   it("responds with a 'Not found' message if request is not recognized", (done) => {
-    request(app)
+    requestWithSupertest
       .get("/not-valid")
       .set("Accept", "application/json")
       .expect("Content-Type", /json/)

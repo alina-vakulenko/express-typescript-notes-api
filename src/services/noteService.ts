@@ -1,16 +1,19 @@
 import noteRepository from "@repositories/noteRepository";
 import {
-  NoteCreateInput,
-  NoteUpdateInput,
+  CreateNoteInput,
+  UpdateNoteInput,
   NoteId,
   Note,
 } from "@schemas/notes.schema";
 import { AppError } from "@helpers/appError.utils";
 import { HttpCode } from "@helpers/httpStatusCodes.utils";
-import { Stats } from "./types";
+
+export type Stats = {
+  [category: string]: Record<"active" | "archived", number>;
+};
 
 class NoteService {
-  async createNote(input: NoteCreateInput): Promise<Note> {
+  async createNote(input: CreateNoteInput): Promise<Note> {
     const newNote = await noteRepository.create(input);
     return newNote;
   }
@@ -39,7 +42,7 @@ class NoteService {
 
     return note;
   }
-  async updateNote(id: NoteId, input: NoteUpdateInput): Promise<void> {
+  async updateNote(id: NoteId, input: UpdateNoteInput): Promise<void> {
     const note = await noteRepository.findById(id);
 
     if (!note) {
@@ -89,14 +92,19 @@ class NoteService {
     const stats: Stats = {};
 
     for (const note of notesList) {
-      const category = note.categoryId;
-      const status = note.archived ? "archived" : "active";
+      if (note.category) {
+        const categorySlug = note.category.slug;
 
-      if (!stats[category]) {
-        stats[category] = { active: 0, archived: 0 };
+        stats[categorySlug].active =
+          Math.max(stats[categorySlug].active, 0) + 1;
+        stats[categorySlug].archived =
+          Math.max(stats[categorySlug].archived, 0) + 1;
+      } else {
+        stats["withoutCategory"].active =
+          Math.max(stats["withoutCategory"].active, 0) + 1;
+        stats["withoutCategory"].archived =
+          Math.max(stats["withoutCategory"].archived, 0) + 1;
       }
-
-      stats[category][status]++;
     }
 
     return stats;

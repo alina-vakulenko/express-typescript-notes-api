@@ -12,6 +12,10 @@ module.exports = {
         allowNull: false,
         unique: true,
       },
+      slug: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,
@@ -27,14 +31,11 @@ module.exports = {
       },
       category_id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 1,
         references: {
           model: "categories",
           key: "id",
         },
-        onDelete: "SET DEFAULT",
-        onUpdate: "CASCADE",
+        onDelete: "SET NULL",
       },
       name: {
         type: Sequelize.STRING,

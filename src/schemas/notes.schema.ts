@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CategorySchema } from "./categories.schema";
 
 export const NoteSchema = z.object({
   id: z
@@ -12,30 +13,26 @@ export const NoteSchema = z.object({
     })
     .min(1, "Name should not be empty")
     .trim(),
-  createdAt: z.coerce.date(),
-  categoryId: z.number({
-    required_error: "Category id is required",
-    invalid_type_error: "Category id should be an integer",
-  }),
+  categoryId: z.number().nullable(),
+  category: CategorySchema.optional(),
   content: z.string().min(1, "Content should not be empty").trim(),
   dates: z.array(z.coerce.date()).optional(),
   archived: z.boolean().default(false),
+  createdAt: z.coerce.date(),
 });
 
-export const NoteCreateSchema = NoteSchema.pick({
+export const CreateNoteSchema = NoteSchema.pick({
   name: true,
-  categoryId: true,
   content: true,
 });
 
 export const NoteIdSchema = z.string().uuid();
-export const ParamsWithIdSchema = z.object({ id: NoteIdSchema });
-export const NoteUpdateSchema = NoteCreateSchema.partial().merge(
+export const ParamsWithNoteIdSchema = z.object({ id: NoteIdSchema });
+export const UpdateNoteSchema = CreateNoteSchema.partial().merge(
   z.object({ archived: z.boolean().optional() })
 );
 
 export type Note = z.infer<typeof NoteSchema>;
-export type NoteCreateInput = z.infer<typeof NoteCreateSchema>;
-export type NoteUpdateInput = z.infer<typeof NoteUpdateSchema>;
+export type CreateNoteInput = z.infer<typeof CreateNoteSchema>;
+export type UpdateNoteInput = z.infer<typeof UpdateNoteSchema>;
 export type NoteId = z.infer<typeof NoteIdSchema>;
-export type ParamsWithId = z.infer<typeof ParamsWithIdSchema>;
