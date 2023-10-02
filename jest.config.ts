@@ -9,7 +9,11 @@ const jestConfig: JestConfigWithTsJest = {
   clearMocks: true,
   resetMocks: true,
   restoreMocks: true,
-  testPathIgnorePatterns: ["\\.fixture\\.ts$"],
+  testPathIgnorePatterns: [
+    "\\.fixture\\.ts$",
+    "\\config\\.ts$",
+    "\\utils\\.ts$",
+  ],
   modulePaths: ["src"],
   moduleNameMapper: pathsToModuleNameMapper({
     "@app/*": ["app/*"],

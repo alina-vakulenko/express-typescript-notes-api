@@ -4,32 +4,23 @@ export const secontTestDate = new Date("2023-08-03").toISOString();
 export const noteIdValidNotExisting = uuid();
 
 export const statsObject = {
-  "1": {
-    active: 34,
-    archived: 0,
+  active: {
+    task: 5,
   },
-  "2": {
-    active: 2,
-    archived: 1,
-  },
-  "3": {
-    active: 6,
-    archived: 1,
+  archived: {
+    task: 1,
   },
 };
 
 export const noteCreateInput = {
   name: "Test note",
-  categoryId: 3,
-  content:
-    "This is the first date 8/2/2023, and this is the second date 08/03/2023",
+  content: "Content of test note",
 };
 
 export const noteUpdateInput = {
   name: "Name of updated note",
-  categoryId: 1,
-  content: "Content of updated note",
-  archived: true,
+  content:
+    "This is the first date 8/2/2023, and this is the second date 08/03/2023.",
 };
 
 export const invalidNoteCreateInput = {

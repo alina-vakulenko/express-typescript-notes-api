@@ -7,10 +7,10 @@ import {
 } from "@schemas/notes.schema";
 import { AppError } from "@helpers/appError.utils";
 import { HttpCode } from "@helpers/httpStatusCodes.utils";
+import { Category } from "@schemas/categories.schema";
 
-export type Stats = {
-  [category: string]: Record<"active" | "archived", number>;
-};
+type NoteStatsByStatus = Record<Category["slug"], number>;
+type Stats = Record<"active" | "archived", NoteStatsByStatus>;
 
 class NoteService {
   async createNote(input: CreateNoteInput): Promise<Note> {
@@ -43,9 +43,9 @@ class NoteService {
     return note;
   }
   async updateNote(id: NoteId, input: UpdateNoteInput): Promise<void> {
-    const note = await noteRepository.findById(id);
-
-    if (!note) {
+    const existingNote = await noteRepository.findById(id);
+    console.log("note to update", existingNote);
+    if (!existingNote) {
       throw new AppError({
         httpCode: HttpCode.NOT_FOUND,
         message: `Note with id ${id} was not found`,
@@ -56,7 +56,7 @@ class NoteService {
     // if note is archived, only "archived" status can be changed
     const fieldsToEditExcludingArchived = Object.keys(otherInputs).length > 0;
 
-    if (note.archived && fieldsToEditExcludingArchived) {
+    if (existingNote.archived && fieldsToEditExcludingArchived) {
       throw new AppError({
         httpCode: HttpCode.FORBIDDEN,
         message: "Archived notes can't be changed",
@@ -89,21 +89,18 @@ class NoteService {
       });
     }
 
-    const stats: Stats = {};
+    const stats: Stats = { active: {}, archived: {} };
 
     for (const note of notesList) {
+      const status = note.archived ? "archived" : "active";
+
       if (note.category) {
         const categorySlug = note.category.slug;
-
-        stats[categorySlug].active =
-          Math.max(stats[categorySlug].active, 0) + 1;
-        stats[categorySlug].archived =
-          Math.max(stats[categorySlug].archived, 0) + 1;
+        const categoryStats = stats[status][categorySlug];
+        stats[status][categorySlug] = categoryStats + 1 || 1;
       } else {
-        stats["withoutCategory"].active =
-          Math.max(stats["withoutCategory"].active, 0) + 1;
-        stats["withoutCategory"].archived =
-          Math.max(stats["withoutCategory"].archived, 0) + 1;
+        stats[status]["withoutCategory"] =
+          stats[status]["withoutCategory"] + 1 || 1;
       }
     }
 

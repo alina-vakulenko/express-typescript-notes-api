@@ -1,7 +1,8 @@
-import { createRandomNote } from "./utils";
 import * as testData from "./notes.fixture";
-import { Note } from "./../src/schemas/notes.schema";
+import { Note } from "../src/schemas/notes.schema";
 import { requestWithSupertest } from "./config";
+import { createRandomNote } from "./utils";
+import { prepareNoteObject } from "./utils";
 
 describe("GET /notes", () => {
   it("responds with a non-emty array and a number of items in the array", async () => {
@@ -35,7 +36,6 @@ describe("If an id passed as a query parameter is invalid", () => {
       .set("Accept", "application/json")
       .send({
         name: "Note should not be created",
-        categoryId: 1,
         content: "Id is invalid",
       });
 
@@ -71,7 +71,6 @@ describe("If an id passed as a query parameter doesn't exist in a DB", () => {
       .set("Accept", "application/json")
       .send({
         name: "Note should not be created",
-        categoryId: 1,
         content: "Id does not exist",
       });
 
@@ -107,7 +106,7 @@ describe("queries on a single test note", () => {
 
       expect(res.statusCode).toBe(200);
       expect(res.headers["content-type"]).toMatch(/json/);
-      expect(res.body).toEqual(createdNote);
+      expect(res.body).toEqual(prepareNoteObject(createdNote));
     });
   });
 
@@ -133,6 +132,33 @@ describe("queries on a single test note", () => {
       expect(res.headers["content-type"]).toMatch(/json/);
       expect(res.body.message).toBe("success");
     });
+    it("changes extracted dates if content was edited", async () => {
+      const res = await requestWithSupertest
+        .get(`/notes/${createdNote.id}`)
+        .set("Accept", "application/json");
+
+      expect(res.statusCode).toBe(200);
+      expect(res.headers["content-type"]).toMatch(/json/);
+      expect(res.body.dates).toEqual(
+        expect.arrayContaining([
+          "2023-08-01T21:00:00.000Z",
+          "2023-08-03T00:00:00.000Z",
+        ])
+      );
+    });
+  });
+
+  describe("PATCH /notes/:id (archived status)", () => {
+    it("allows to mark a note as archived", async () => {
+      const res = await requestWithSupertest
+        .patch(`/notes/${createdNote.id}`)
+        .set("Accept", "application/json")
+        .send({ archived: true });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.headers["content-type"]).toMatch(/json/);
+      expect(res.body.message).toBe("success");
+    });
     it("responds with a 403 status code and a warning message if the note is archived", async () => {
       const res = await requestWithSupertest
         .patch(`/notes/${createdNote.id}`)
@@ -143,6 +169,7 @@ describe("queries on a single test note", () => {
       expect(res.headers["content-type"]).toMatch(/json/);
       expect(res.body.message).toBe("Archived notes can't be changed");
     });
+
     it("allows to unarchive the note", async () => {
       const res = await requestWithSupertest
         .patch(`/notes/${createdNote.id}`)
@@ -157,29 +184,23 @@ describe("queries on a single test note", () => {
       const res = await requestWithSupertest
         .patch(`/notes/${createdNote.id}`)
         .set("Accept", "application/json")
-        .send({ content: "01/01/2023 new content with dates" });
+        .send({ content: "note is no more archived" });
 
       expect(res.statusCode).toBe(200);
       expect(res.headers["content-type"]).toMatch(/json/);
       expect(res.body.message).toBe("success");
     });
-    it("changes extracted dates if content was edited", async () => {
-      const res = await requestWithSupertest
-        .get(`/notes/${createdNote.id}`)
-        .set("Accept", "application/json");
-
-      expect(res.statusCode).toBe(200);
-      expect(res.headers["content-type"]).toMatch(/json/);
-      expect(res.body.dates).toEqual(
-        expect.arrayContaining(["2023-01-01T00:00:00.000Z"])
-      );
-    });
   });
 });
 
 describe("POST /notes", () => {
+  afterAll(async () => {
+    await requestWithSupertest.delete(`/notes/${createdNote.id}`);
+    createdNote = {} as Note;
+  });
   it("responds with a 201 status code and the generated note object", async () => {
     const res = await createRandomNote();
+    createdNote = res.body;
 
     expect(res.statusCode).toBe(201);
     expect(res.headers["content-type"]).toMatch(/json/);
@@ -187,12 +208,8 @@ describe("POST /notes", () => {
     expect(res.body).toHaveProperty("createdAt");
     expect(res.body).toHaveProperty("dates");
     expect(res.body).toHaveProperty("archived");
+    // expect(res.body).toHaveProperty("category");
     expect(res.body.archived).toBe(false);
-    expect(res.body.dates).toEqual(
-      expect.arrayContaining([testData.firstTestDate, testData.secontTestDate])
-    );
-
-    await requestWithSupertest.delete(`/notes/${res.body.id}`);
   });
   it("responds with a 400 status code and an array of validation issues if the request is incorrect", async () => {
     const res = await requestWithSupertest
@@ -212,6 +229,9 @@ describe("DELETE /notes/:id", () => {
     const res = await createRandomNote();
     createdNote = res.body;
   });
+  afterAll(() => {
+    createdNote = {} as Note;
+  });
 
   it("responds with a 200 status code and a success message", async () => {
     const res = await requestWithSupertest.delete(`/notes/${createdNote.id}`);
@@ -221,15 +241,15 @@ describe("DELETE /notes/:id", () => {
   });
 });
 
-// describe("GET /notes/stats", () => {
-//   it("responds with an object containing the number of notes by categories", async () => {
-//     const res = await requestWithSupertest
-//       .get("/notes/stats")
-//       .set("Accept", "application/json");
+describe("GET /notes/stats", () => {
+  it("responds with an object containing the number of notes by categories", async () => {
+    const res = await requestWithSupertest
+      .get("/notes/stats")
+      .set("Accept", "application/json");
 
-//     expect(res.statusCode).toBe(200);
-//     expect(res.headers["content-type"]).toMatch(/json/);
-//     expect(res.body).toHaveProperty("stats");
-//     expect(res.body.stats).toEqual(testData.statsObject);
-//   });
-// });
+    expect(res.statusCode).toBe(200);
+    expect(res.headers["content-type"]).toMatch(/json/);
+    expect(res.body).toHaveProperty("stats");
+    expect(res.body.stats).toEqual(testData.statsObject);
+  });
+});

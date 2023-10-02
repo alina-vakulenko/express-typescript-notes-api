@@ -11,7 +11,7 @@
     "migrate:up": "npm run build && npx sequelize-cli db:migrate",
     "migrate:undo": "npx sequelize-cli db:migrate:undo",
     "seed": "npx sequelize-cli db:seed:all",
-    "test": "jest --coverage --detectOpenHandles"
+    "test": "jest --coverage"
   },
   "keywords": [],
   "author": "",
