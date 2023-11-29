@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CategorySchema } from "./categories.schema";
+import { CategorySchema } from "./category.schema";
 
 export const NoteSchema = z.object({
   id: z
@@ -24,7 +24,7 @@ export const NoteSchema = z.object({
 export const CreateNoteSchema = NoteSchema.pick({
   name: true,
   content: true,
-});
+}).merge(z.object({ categoryId: z.number().optional() }));
 
 export const NoteIdSchema = z.string().uuid();
 export const ParamsWithNoteIdSchema = z.object({ id: NoteIdSchema });
@@ -32,7 +32,8 @@ export const UpdateNoteSchema = CreateNoteSchema.partial().merge(
   z.object({ archived: z.boolean().optional() })
 );
 
+export type NoteId = string;
+export type NoteQueryParams = z.infer<typeof ParamsWithNoteIdSchema>;
 export type Note = z.infer<typeof NoteSchema>;
-export type CreateNoteInput = z.infer<typeof CreateNoteSchema>;
-export type UpdateNoteInput = z.infer<typeof UpdateNoteSchema>;
-export type NoteId = z.infer<typeof NoteIdSchema>;
+export type CreateNoteReq = z.infer<typeof CreateNoteSchema>;
+export type UpdateNoteReq = z.infer<typeof UpdateNoteSchema>;

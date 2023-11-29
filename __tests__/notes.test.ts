@@ -1,5 +1,5 @@
 import * as testData from "./notes.fixture";
-import { Note } from "../src/schemas/notes.schema";
+import { Note } from "../src/schemas/note.schema";
 import { requestWithSupertest } from "./config";
 import { createRandomNote } from "./utils";
 import { prepareNoteObject } from "./utils";

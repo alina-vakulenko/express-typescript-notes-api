@@ -1,11 +1,9 @@
 import { Options, Dialect } from "sequelize";
 import env from "../env";
 
-interface Config {
-  development: Options;
-  test: Options;
-  production: Options;
-}
+type Environment = "development" | "test" | "production";
+
+type Config = Record<Environment, Options>;
 
 const dbConfig: Config = {
   development: {
@@ -34,7 +32,7 @@ const dbConfig: Config = {
   },
 };
 
-const currentEnv = (env.NODE_ENV as keyof Config) || "development";
+const currentEnv: Environment = (env.NODE_ENV as Environment) || "development";
 
 export default dbConfig[currentEnv];
 module.exports = dbConfig[currentEnv];

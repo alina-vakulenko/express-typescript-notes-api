@@ -5,7 +5,7 @@ import { AppError } from "@helpers/appError.utils";
 import { ValidationError } from "@helpers/validationError.utils";
 import { logger } from "@helpers/logger.utils";
 
-class ErrorHandler {
+class ErrorHandlingService {
   private logger: Logger;
 
   constructor(logger: Logger) {
@@ -47,6 +47,6 @@ class ErrorHandler {
   }
 }
 
-const errorHandler = new ErrorHandler(logger);
+const errorHandlingService = new ErrorHandlingService(logger);
 
-export default errorHandler;
+export default errorHandlingService;

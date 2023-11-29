@@ -9,6 +9,7 @@ export interface AppErrorArgs {
 
 export class AppError extends Error {
   public readonly name: string;
+  public readonly timestamp: string;
   public readonly httpCode: HttpCode;
   public readonly isOperational: boolean = true;
 
@@ -16,17 +17,18 @@ export class AppError extends Error {
     if (args.message) {
       super(args.message);
     } else {
-      super("An error occurred!");
+      super("An error occurred! Please try again later.");
     }
 
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = args.name || "Error";
     this.httpCode = args.httpCode;
+    this.timestamp = new Date().toISOString();
 
     if (args.isOperational !== undefined) {
       this.isOperational = args.isOperational;
     }
 
-    Error.captureStackTrace(this);
+    Error.captureStackTrace(this, this.constructor);
   }
 }

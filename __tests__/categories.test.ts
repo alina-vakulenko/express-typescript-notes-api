@@ -1,4 +1,4 @@
-import { Category } from "@schemas/categories.schema";
+import { Category } from "@schemas/category.schema";
 import { requestWithSupertest } from "./config";
 import { createRandomCategory } from "./utils";
 

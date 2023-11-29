@@ -1,20 +1,22 @@
 import express from "express";
 import cors from "cors";
 import corsOptions from "@config/corsOptions";
-import setCredentialsHeader from "@middleware/setCredentialsHeader";
-import handleNotFound from "@middleware/handleNotFound";
-import handleErrors from "@middleware/handleErrors";
+import {
+  errorHandler,
+  notFoundHandler,
+  credentialsHeaderHandler,
+} from "@middleware/index";
 import appRouter from "@routes/index";
 
 const app = express();
 
 app.use(cors(corsOptions));
 app.use(express.json());
-app.use(setCredentialsHeader);
+app.use(credentialsHeaderHandler);
 
-app.use("", appRouter);
+app.use("/api/v1", appRouter);
 
-app.use(handleNotFound);
-app.use(handleErrors);
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 export default app;

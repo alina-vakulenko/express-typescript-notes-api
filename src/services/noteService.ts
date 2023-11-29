@@ -1,20 +1,20 @@
-import noteRepository from "@repositories/noteRepository";
-import {
-  CreateNoteInput,
-  UpdateNoteInput,
-  NoteId,
-  Note,
-} from "@schemas/notes.schema";
+import noteRepository from "@repositories/note.repository";
 import { AppError } from "@helpers/appError.utils";
 import { HttpCode } from "@helpers/httpStatusCodes.utils";
-import { Category } from "@schemas/categories.schema";
+import { Category } from "@schemas/category.schema";
+import {
+  CreateNoteReq,
+  Note,
+  NoteId,
+  UpdateNoteReq,
+} from "@schemas/note.schema";
 
-type NoteStatsByStatus = Record<Category["slug"], number>;
-type Stats = Record<"active" | "archived", NoteStatsByStatus>;
+type NoteStatsByCategory = Record<Category["slug"], number>;
+type Stats = Record<"active" | "archived", NoteStatsByCategory>;
 
 class NoteService {
-  async createNote(input: CreateNoteInput): Promise<Note> {
-    const newNote = await noteRepository.create(input);
+  async createNote(req: CreateNoteReq): Promise<Note> {
+    const newNote = await noteRepository.create(req);
     return newNote;
   }
   async getAllNotes(): Promise<Note[]> {
@@ -42,7 +42,7 @@ class NoteService {
 
     return note;
   }
-  async updateNote(id: NoteId, input: UpdateNoteInput): Promise<void> {
+  async updateNote(id: NoteId, input: UpdateNoteReq): Promise<void> {
     const existingNote = await noteRepository.findById(id);
     console.log("note to update", existingNote);
     if (!existingNote) {
@@ -80,27 +80,22 @@ class NoteService {
   }
 
   async getStats(): Promise<Stats> {
-    const notesList = await noteRepository.findAll();
-
-    if (notesList.length === 0) {
-      throw new AppError({
-        httpCode: HttpCode.NO_CONTENT,
-        message: "Notes list is empty",
-      });
-    }
-
     const stats: Stats = { active: {}, archived: {} };
 
-    for (const note of notesList) {
-      const status = note.archived ? "archived" : "active";
+    const notesList = await noteRepository.findAll();
 
-      if (note.category) {
-        const categorySlug = note.category.slug;
-        const categoryStats = stats[status][categorySlug];
-        stats[status][categorySlug] = categoryStats + 1 || 1;
-      } else {
-        stats[status]["withoutCategory"] =
-          stats[status]["withoutCategory"] + 1 || 1;
+    if (notesList.length > 0) {
+      for (const note of notesList) {
+        const status = note.archived ? "archived" : "active";
+
+        if (note.category) {
+          const categorySlug = note.category.slug;
+          const categoryStats = stats[status][categorySlug];
+          stats[status][categorySlug] = categoryStats + 1 || 1;
+        } else {
+          stats[status]["withoutCategory"] =
+            stats[status]["withoutCategory"] + 1 || 1;
+        }
       }
     }
 

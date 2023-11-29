@@ -1,4 +1,4 @@
-import { Note } from "@schemas/notes.schema";
+import { Note } from "@schemas/note.schema";
 import { requestWithSupertest } from "./config";
 import * as testData from "./notes.fixture";
 

@@ -4,8 +4,9 @@ import {
   InferAttributes,
   InferCreationAttributes,
   CreationOptional,
-  BelongsToCreateAssociationMixin,
   BelongsToGetAssociationMixin,
+  BelongsToSetAssociationMixin,
+  BelongsToCreateAssociationMixin,
   UUIDV4,
   NonAttribute,
   Association,
@@ -25,6 +26,7 @@ class Note extends Model<InferAttributes<Note>, InferCreationAttributes<Note>> {
   declare category?: NonAttribute<Category>; //an eagerly-loaded association
 
   declare getCategory: BelongsToGetAssociationMixin<Category>;
+  declare setCategory: BelongsToSetAssociationMixin<Category, number>;
   declare createCategory: BelongsToCreateAssociationMixin<Category>;
 
   declare readonly createdAt: CreationOptional<Date>;

@@ -2,7 +2,7 @@ import "dotenv/config";
 import { cleanEnv, port, str } from "envalid";
 
 const env = cleanEnv(process.env, {
-  NODE_ENV: str({ choices: ["development", "test", "production", "staging"] }),
+  NODE_ENV: str({ choices: ["development", "test", "production"] }),
   DB_DRIVER: str(),
   PORT: port(),
   POSTGRES_DB: str(),

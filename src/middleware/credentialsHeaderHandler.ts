@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import allowedOrigins from "@config/allowedOrigins";
 
-const setCredentialsHeader = (
+const credentialsHeaderHandler = (
   req: Request,
   res: Response,
   next: NextFunction
@@ -15,4 +15,4 @@ const setCredentialsHeader = (
   next();
 };
 
-export default setCredentialsHeader;
+export default credentialsHeaderHandler;

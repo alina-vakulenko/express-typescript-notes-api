@@ -1,15 +1,16 @@
-import categoryRepository from "@repositories/categoryRepository";
-import {
-  CreateCategoryInput,
-  UpdateCategoryInput,
-  Category,
-} from "@schemas/categories.schema";
+import categoryRepository from "@repositories/category.repository";
 import { AppError } from "@helpers/appError.utils";
 import { HttpCode } from "@helpers/httpStatusCodes.utils";
+import type {
+  Category,
+  CreateCategoryReq,
+  UpdateCategoryReq,
+} from "@schemas/category.schema";
 
 class CategoryService {
-  async createCategory(input: CreateCategoryInput): Promise<Category> {
-    const newCategory = await categoryRepository.create(input);
+  async createCategory(req: CreateCategoryReq): Promise<Category> {
+    const newCategory = await categoryRepository.create(req);
+    console.log("create category service", newCategory);
     return newCategory;
   }
 
@@ -26,11 +27,8 @@ class CategoryService {
     return categoriesList;
   }
 
-  async updateCategory(
-    slug: string,
-    input: UpdateCategoryInput
-  ): Promise<void> {
-    const category = await categoryRepository.findOneBySlug(slug);
+  async updateCategory(slug: string, req: UpdateCategoryReq): Promise<void> {
+    const category = await categoryRepository.findOne(slug);
 
     if (!category) {
       throw new AppError({
@@ -39,11 +37,11 @@ class CategoryService {
       });
     }
 
-    await categoryRepository.updateOne(slug, input);
+    await categoryRepository.updateOne(slug, req);
   }
 
   async deleteCategory(slug: string): Promise<void> {
-    const category = await categoryRepository.findOneBySlug(slug);
+    const category = await categoryRepository.findOne(slug);
 
     if (!category) {
       throw new AppError({

@@ -22,6 +22,7 @@ const jestConfig: JestConfigWithTsJest = {
     "@db/*": ["db/*"],
     "@schemas/*": ["schemas/*"],
     "@repositories/*": ["repositories/*"],
+    "@controllers/*": ["controllers/*"],
     "@services/*": ["services/*"],
     "@routes/*": ["routes/*"],
     "@middleware/*": ["middleware/*"],

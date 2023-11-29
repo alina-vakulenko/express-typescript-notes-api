@@ -21,9 +21,9 @@ export const CreateCategorySchema = CategorySchema.pick({
   name: true,
 });
 export const UpdateCategorySchema = CreateCategorySchema.partial();
-
 export const ParamsWithSlugSchema = CategorySchema.pick({ slug: true });
 
+export type CategoryQueryParams = z.infer<typeof ParamsWithSlugSchema>;
 export type Category = z.infer<typeof CategorySchema>;
-export type CreateCategoryInput = z.infer<typeof CreateCategorySchema>;
-export type UpdateCategoryInput = z.infer<typeof UpdateCategorySchema>;
+export type CreateCategoryReq = z.infer<typeof CreateCategorySchema>;
+export type UpdateCategoryReq = z.infer<typeof UpdateCategorySchema>;
