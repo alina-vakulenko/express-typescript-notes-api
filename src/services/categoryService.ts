@@ -10,47 +10,41 @@ import type {
 class CategoryService {
   async createCategory(req: CreateCategoryReq): Promise<Category> {
     const newCategory = await categoryRepository.create(req);
-    console.log("create category service", newCategory);
     return newCategory;
   }
 
-  async getAllCategories(): Promise<Category[]> {
+  async getAllCategories(): Promise<{ count: number; categories: Category[] }> {
     const categoriesList = await categoryRepository.findAll();
+    return { count: categoriesList.length, categories: categoriesList };
+  }
 
-    if (categoriesList.length === 0) {
+  async updateCategory(
+    slug: string,
+    req: UpdateCategoryReq
+  ): Promise<Category> {
+    const updatedCategory = await categoryRepository.updateOne(slug, req);
+
+    if (!updatedCategory) {
       throw new AppError({
-        httpCode: HttpCode.NO_CONTENT,
-        message: "Categories list is empty",
+        httpCode: HttpCode.NOT_FOUND,
+        message: `Category ${slug} was not found or not updated`,
       });
     }
 
-    return categoriesList;
+    return updatedCategory;
   }
 
-  async updateCategory(slug: string, req: UpdateCategoryReq): Promise<void> {
-    const category = await categoryRepository.findOne(slug);
+  async deleteCategory(slug: string): Promise<{ message: string }> {
+    const success = await categoryRepository.deleteOne(slug);
 
-    if (!category) {
+    if (!success) {
       throw new AppError({
         httpCode: HttpCode.NOT_FOUND,
         message: `Category ${slug} was not found`,
       });
     }
 
-    await categoryRepository.updateOne(slug, req);
-  }
-
-  async deleteCategory(slug: string): Promise<void> {
-    const category = await categoryRepository.findOne(slug);
-
-    if (!category) {
-      throw new AppError({
-        httpCode: HttpCode.NOT_FOUND,
-        message: `Category ${slug} was not found`,
-      });
-    }
-
-    await categoryRepository.deleteOne(slug);
+    return { message: "success" };
   }
 }
 

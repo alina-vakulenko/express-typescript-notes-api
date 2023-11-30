@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import categoryService from "@services/categoryService";
 import { asyncErrorHandler } from "@helpers/asyncErrorHandler";
+import categoryService from "@services/categoryService";
 
 export const createCategory = asyncErrorHandler(
   async (req: Request, res: Response) => {
@@ -11,21 +11,24 @@ export const createCategory = asyncErrorHandler(
 
 export const getCategories = asyncErrorHandler(
   async (req: Request, res: Response) => {
-    const categories = await categoryService.getAllCategories();
-    res.status(200).json({ count: categories.length, categories });
+    const response = await categoryService.getAllCategories();
+    res.status(200).json(response);
   }
 );
 
 export const updateCategory = asyncErrorHandler(
   async (req: Request, res: Response) => {
-    await categoryService.updateCategory(req.params.slug, req.body.data);
-    res.status(200).json({ message: "success" });
+    const updatedCategory = await categoryService.updateCategory(
+      req.params.slug,
+      req.body
+    );
+    res.status(200).json(updatedCategory);
   }
 );
 
 export const deleteCategory = asyncErrorHandler(
   async (req: Request, res: Response) => {
-    await categoryService.deleteCategory(req.params.slug);
-    res.status(200).json({ message: "success" });
+    const response = await categoryService.deleteCategory(req.params.slug);
+    res.status(200).json(response);
   }
 );

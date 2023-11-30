@@ -20,7 +20,9 @@ export const CategorySchema = z.object({
 export const CreateCategorySchema = CategorySchema.pick({
   name: true,
 });
-export const UpdateCategorySchema = CreateCategorySchema.partial();
+export const UpdateCategorySchema = CategorySchema.pick({
+  name: true,
+});
 export const ParamsWithSlugSchema = CategorySchema.pick({ slug: true });
 
 export type CategoryQueryParams = z.infer<typeof ParamsWithSlugSchema>;

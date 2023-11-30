@@ -8,6 +8,7 @@ import {
   NoteId,
   UpdateNoteReq,
 } from "@schemas/note.schema";
+import { updateCategory } from "@controllers/categoriesController";
 
 type NoteStatsByCategory = Record<Category["slug"], number>;
 type Stats = Record<"active" | "archived", NoteStatsByCategory>;
@@ -17,17 +18,10 @@ class NoteService {
     const newNote = await noteRepository.create(req);
     return newNote;
   }
-  async getAllNotes(): Promise<Note[]> {
+
+  async getAllNotes(): Promise<{ count: number; notes: Note[] }> {
     const notesList = await noteRepository.findAll();
-
-    if (notesList.length === 0) {
-      throw new AppError({
-        httpCode: HttpCode.NO_CONTENT,
-        message: "Notes list is empty",
-      });
-    }
-
-    return notesList;
+    return { count: notesList.length, notes: notesList };
   }
 
   async getNoteById(id: NoteId): Promise<Note> {
@@ -42,9 +36,10 @@ class NoteService {
 
     return note;
   }
-  async updateNote(id: NoteId, input: UpdateNoteReq): Promise<void> {
+
+  async updateNote(id: NoteId, input: UpdateNoteReq): Promise<Note> {
     const existingNote = await noteRepository.findById(id);
-    console.log("note to update", existingNote);
+
     if (!existingNote) {
       throw new AppError({
         httpCode: HttpCode.NOT_FOUND,
@@ -63,23 +58,32 @@ class NoteService {
       });
     }
 
-    await noteRepository.updateOne(id, input);
+    const updatedNote = await noteRepository.updateOne(id, input);
+
+    if (!updatedNote) {
+      throw new AppError({
+        httpCode: HttpCode.NOT_FOUND,
+        message: `Note with id ${id} was not found or not updated`,
+      });
+    }
+
+    return updatedNote;
   }
 
-  async deleteNote(id: NoteId): Promise<void> {
-    const note = await noteRepository.findById(id);
+  async deleteNote(id: NoteId): Promise<{ message: string }> {
+    const success = await noteRepository.deleteOne(id);
 
-    if (!note) {
+    if (!success) {
       throw new AppError({
         httpCode: HttpCode.NOT_FOUND,
         message: `Note with id ${id} was not found`,
       });
     }
 
-    await noteRepository.deleteOne(id);
+    return { message: "success" };
   }
 
-  async getStats(): Promise<Stats> {
+  async getStats(): Promise<{ stats: Stats }> {
     const stats: Stats = { active: {}, archived: {} };
 
     const notesList = await noteRepository.findAll();
@@ -99,7 +103,7 @@ class NoteService {
       }
     }
 
-    return stats;
+    return { stats };
   }
 }
 

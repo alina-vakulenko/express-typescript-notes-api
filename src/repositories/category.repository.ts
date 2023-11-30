@@ -15,29 +15,36 @@ class CategoryRepository {
   }
 
   public async findAll(): Promise<Category[]> {
-    const dataArray = await CategoryModel.findAll({
-      attributes: ["name", "slug"],
-    });
+    const dataArray = await CategoryModel.findAll();
     return dataArray.map((item) => new CategoryDto.CategoryResDTO(item));
   }
 
-  public async findOne(slug: string): Promise<Category | null> {
-    const data = await CategoryModel.findOne({ where: { slug } });
-    return data ? new CategoryDto.CategoryResDTO(data) : null;
-  }
-
-  public async deleteOne(slug: string): Promise<void> {
-    const res = await CategoryModel.destroy({
+  public async deleteOne(slug: string): Promise<boolean> {
+    const responseCode = await CategoryModel.destroy({
       where: {
         slug,
       },
     });
-    console.log("delete category result", res);
+
+    return responseCode === 1;
   }
 
-  public async updateOne(slug: string, body: UpdateCategoryReq): Promise<void> {
-    const data = await CategoryModel.update(body, { where: { slug } });
-    console.log("update category result", data);
+  public async updateOne(
+    slug: string,
+    data: UpdateCategoryReq
+  ): Promise<Category | null> {
+    const updatedSlug = slugify(data.name);
+    const [updatedRowsCount, updatedCategories] = await CategoryModel.update(
+      { ...data, slug: updatedSlug },
+      {
+        where: { slug },
+        returning: true,
+      }
+    );
+
+    return updatedRowsCount > 0
+      ? new CategoryDto.CategoryResDTO(updatedCategories[0])
+      : null;
   }
 }
 

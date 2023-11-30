@@ -19,7 +19,6 @@ class NoteRepository {
       attributes: { exclude: ["categoryId"] },
       include: {
         model: CategoryModel,
-        attributes: ["slug", "name"],
       },
     });
 
@@ -29,24 +28,34 @@ class NoteRepository {
   public async findById(id: NoteId): Promise<Note | null> {
     const data = await NoteModel.findByPk(id, {
       attributes: { exclude: ["categoryId"] },
-      include: { model: CategoryModel, attributes: ["slug", "name"] },
+      include: { model: CategoryModel },
     });
 
     return data ? new NoteDto.NoteResDTO(data) : null;
   }
 
-  public async deleteOne(id: NoteId): Promise<void> {
-    const res = await NoteModel.destroy({
+  public async deleteOne(id: NoteId): Promise<boolean> {
+    const responseCode = await NoteModel.destroy({
       where: {
         id,
       },
     });
-    console.log("delete note response", res);
+
+    return responseCode === 1;
   }
 
-  public async updateOne(id: NoteId, data: UpdateNoteReq): Promise<void> {
-    const res = await NoteModel.update(data, { where: { id } });
-    console.log("update note response", res);
+  public async updateOne(
+    id: NoteId,
+    data: UpdateNoteReq
+  ): Promise<Note | null> {
+    const [updatedRowsCount, updatedCategories] = await NoteModel.update(data, {
+      where: { id },
+      returning: true,
+    });
+
+    return updatedRowsCount > 0
+      ? new NoteDto.NoteResDTO(updatedCategories[0])
+      : null;
   }
 }
 

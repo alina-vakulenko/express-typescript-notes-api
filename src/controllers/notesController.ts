@@ -11,15 +11,15 @@ export const createNote = asyncErrorHandler(
 
 export const updateNote = asyncErrorHandler(
   async (req: Request, res: Response) => {
-    await noteService.updateNote(req.params.id, req.body);
-    res.status(200).json({ message: "success" });
+    const response = await noteService.updateNote(req.params.id, req.body);
+    res.status(200).json(response);
   }
 );
 
 export const deleteNote = asyncErrorHandler(
   async (req: Request, res: Response) => {
-    await noteService.deleteNote(req.params.id);
-    res.status(200).json({ message: "success" });
+    const response = await noteService.deleteNote(req.params.id);
+    res.status(200).json(response);
   }
 );
 
@@ -32,14 +32,14 @@ export const getNoteById = asyncErrorHandler(
 
 export const getNotes = asyncErrorHandler(
   async (req: Request, res: Response) => {
-    const notes = await noteService.getAllNotes();
-    res.status(200).json({ count: notes.length, notes: notes });
+    const response = await noteService.getAllNotes();
+    res.status(200).json(response);
   }
 );
 
 export const getNotesStats = asyncErrorHandler(
   async (req: Request, res: Response) => {
-    const stats = await noteService.getStats();
-    res.status(200).json({ stats });
+    const response = await noteService.getStats();
+    res.status(200).json(response);
   }
 );

@@ -39,11 +39,12 @@ Category.init(
   {
     id: {
       type: DataTypes.INTEGER,
-      autoIncrement: true,
       primaryKey: true,
+      allowNull: false,
+      autoIncrement: true,
     },
-    name: { type: DataTypes.STRING, allowNull: false, unique: true },
-    slug: { type: DataTypes.STRING, allowNull: false },
+    name: { type: DataTypes.STRING, allowNull: false },
+    slug: { type: DataTypes.STRING, allowNull: false, unique: true },
     createdAt: DataTypes.DATE,
   },
   {
